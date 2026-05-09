@@ -2,8 +2,14 @@ from flask import Flask, render_template, request, redirect, make_response
 from reportlab.pdfgen import canvas
 from io import BytesIO
 import sqlite3
+import os
 
 app = Flask(__name__)
+
+# Upload folder
+UPLOAD_FOLDER = 'static/uploads'
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Database connection
 def get_db():
@@ -32,10 +38,12 @@ def create_table():
         skills TEXT,
         education TEXT,
         experience TEXT,
+        photo TEXT,
         version_number INTEGER
     )
     """)
 
+    conn.commit()
     conn.close()
 
 create_table()
@@ -89,6 +97,7 @@ def login():
 
         if user:
             return redirect('/dashboard')
+
         else:
             return "Invalid Credentials!"
 
@@ -110,6 +119,19 @@ def resume():
         education = request.form['education']
         experience = request.form['experience']
 
+        # Photo upload
+        photo = request.files['photo']
+
+        filename = photo.filename
+
+        # Save image
+        photo.save(
+            os.path.join(
+                app.config['UPLOAD_FOLDER'],
+                filename
+            )
+        )
+
         conn = get_db()
 
         # Get latest version number
@@ -122,12 +144,19 @@ def resume():
         else:
             version = last_version + 1
 
-        # Save new snapshot
+        # Save resume snapshot
         conn.execute("""
         INSERT INTO resume_versions
-        (name, skills, education, experience, version_number)
-        VALUES (?, ?, ?, ?, ?)
-        """, (name, skills, education, experience, version))
+        (name, skills, education, experience, photo, version_number)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            name,
+            skills,
+            education,
+            experience,
+            filename,
+            version
+        ))
 
         conn.commit()
         conn.close()
@@ -181,11 +210,22 @@ def restore(id):
 
     return f"""
     <html>
+
+    <head>
+        <title>Restored Resume</title>
+    </head>
+
     <body>
 
     <h1>Restored Resume</h1>
 
     <hr>
+
+    <img
+    src="/static/uploads/{resume[5]}"
+    width="150"
+    height="150"
+    >
 
     <p><b>Name:</b> {resume[1]}</p>
 
@@ -195,7 +235,7 @@ def restore(id):
 
     <p><b>Experience:</b> {resume[4]}</p>
 
-    <p><b>Version:</b> {resume[5]}</p>
+    <p><b>Version:</b> {resume[6]}</p>
 
     <br>
 
@@ -237,7 +277,7 @@ def download(id):
     conn.close()
 
     content = f"""
-Resume Version: {resume[5]}
+Resume Version: {resume[6]}
 
 Name:
 {resume[1]}
@@ -255,7 +295,7 @@ Experience:
     response = make_response(content)
 
     response.headers["Content-Disposition"] = (
-        f"attachment; filename=resume_version_{resume[5]}.txt"
+        f"attachment; filename=resume_version_{resume[6]}.txt"
     )
 
     response.headers["Content-type"] = "text/plain"
@@ -279,7 +319,8 @@ def pdf(id):
 
     p = canvas.Canvas(buffer)
 
-    p.drawString(100, 800, f"Resume Version: {resume[5]}")
+    # Resume content
+    p.drawString(100, 800, f"Resume Version: {resume[6]}")
 
     p.drawString(100, 760, f"Name: {resume[1]}")
 
@@ -292,6 +333,20 @@ def pdf(id):
     p.drawString(100, 600, "Experience:")
     p.drawString(120, 580, resume[4])
 
+    # Add profile image
+    image_path = os.path.join(
+        app.config['UPLOAD_FOLDER'],
+        resume[5]
+    )
+
+    p.drawImage(
+        image_path,
+        350,
+        650,
+        width=120,
+        height=120
+    )
+
     p.save()
 
     pdf_data = buffer.getvalue()
@@ -303,7 +358,7 @@ def pdf(id):
     response.headers['Content-Type'] = 'application/pdf'
 
     response.headers['Content-Disposition'] = (
-        f'attachment; filename=resume_{resume[5]}.pdf'
+        f'attachment; filename=resume_{resume[6]}.pdf'
     )
 
     return response

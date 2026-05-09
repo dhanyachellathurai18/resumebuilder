@@ -5,28 +5,52 @@
 </head>
 <body>
 
-<h1>Resume Builder</h1>
+<h1>Create Resume</h1>
 
 <hr>
 
-<a href="/dashboard">Dashboard</a> |
-<a href="/versions">View Versions</a>
+<form method="POST" enctype="multipart/form-data">
 
-<hr>
+    <input
+        type="text"
+        name="name"
+        placeholder="Enter Name"
+        required
+    >
 
-<form method="POST">
+    <br><br>
 
-    <h3>Name</h3>
-    <input type="text" name="name" required>
+    <textarea
+        name="skills"
+        placeholder="Enter Skills"
+        required
+    ></textarea>
 
-    <h3>Skills</h3>
-    <textarea name="skills" rows="5" cols="40"></textarea>
+    <br><br>
 
-    <h3>Education</h3>
-    <textarea name="education" rows="5" cols="40"></textarea>
+    <textarea
+        name="education"
+        placeholder="Enter Education"
+        required
+    ></textarea>
 
-    <h3>Experience</h3>
-    <textarea name="experience" rows="5" cols="40"></textarea>
+    <br><br>
+
+    <textarea
+        name="experience"
+        placeholder="Enter Experience"
+        required
+    ></textarea>
+
+    <br><br>
+
+    <label>Upload Profile Photo:</label>
+
+    <input
+        type="file"
+        name="photo"
+        required
+    >
 
     <br><br>
 
@@ -35,6 +59,12 @@
     </button>
 
 </form>
+
+<br>
+
+<a href="/dashboard">
+    Back to Dashboard
+</a>
 
 </body>
 </html>
