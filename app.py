@@ -115,7 +115,7 @@ def resume():
         else:
             version = last_version + 1
 
-        # Insert new snapshot
+        # Save new version snapshot
         conn.execute("""
         INSERT INTO resume_versions
         (name, skills, education, experience, version_number)
@@ -128,6 +128,51 @@ def resume():
         return f"Resume Saved Successfully! Version {version}"
 
     return render_template('resume.html')
+
+# View all versions
+@app.route('/versions')
+def versions():
+
+    conn = get_db()
+
+    resumes = conn.execute("""
+    SELECT * FROM resume_versions
+    ORDER BY version_number DESC
+    """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        'versions.html',
+        resumes=resumes
+    )
+
+# Restore old version
+@app.route('/restore/<int:id>')
+def restore(id):
+
+    conn = get_db()
+
+    resume = conn.execute("""
+    SELECT * FROM resume_versions
+    WHERE id=?
+    """, (id,)).fetchone()
+
+    conn.close()
+
+    return f"""
+    <h2>Restored Resume</h2>
+
+    <p><b>Name:</b> {resume[1]}</p>
+
+    <p><b>Skills:</b> {resume[2]}</p>
+
+    <p><b>Education:</b> {resume[3]}</p>
+
+    <p><b>Experience:</b> {resume[4]}</p>
+
+    <p><b>Version:</b> {resume[5]}</p>
+    """
 
 if __name__ == '__main__':
     app.run(debug=True)

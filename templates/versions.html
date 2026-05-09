@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Versions</title>
+</head>
+<body>
+
+<h2>Saved Resume Versions</h2>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>Version</th>
+    <th>Name</th>
+    <th>Skills</th>
+    <th>Action</th>
+</tr>
+
+{% for resume in resumes %}
+
+<tr>
+
+    <td>{{ resume[5] }}</td>
+    <td>{{ resume[1] }}</td>
+    <td>{{ resume[2] }}</td>
+
+    <td>
+        <a href="/restore/{{ resume[0] }}">
+            Restore
+        </a>
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
