@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect  # type: ignore[reportMissingImports]
+from flask import Flask, render_template, request, redirect
 import sqlite3
 
 app = Flask(__name__)
@@ -7,16 +7,30 @@ app = Flask(__name__)
 def get_db():
     return sqlite3.connect("database.db")
 
-# Create users table
+# Create tables
 def create_table():
+
     conn = get_db()
 
+    # Users table
     conn.execute("""
     CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         email TEXT,
         password TEXT
+    )
+    """)
+
+    # Resume versions table
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS resume_versions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        skills TEXT,
+        education TEXT,
+        experience TEXT,
+        version_number INTEGER
     )
     """)
 
@@ -72,11 +86,48 @@ def login():
         conn.close()
 
         if user:
-            return "Login Successful!"
+            return redirect('/resume')
         else:
             return "Invalid Credentials!"
 
     return render_template('login.html')
 
+# Resume Builder Page
+@app.route('/resume', methods=['GET', 'POST'])
+def resume():
+
+    if request.method == 'POST':
+
+        name = request.form['name']
+        skills = request.form['skills']
+        education = request.form['education']
+        experience = request.form['experience']
+
+        conn = get_db()
+
+        # Get latest version number
+        last_version = conn.execute(
+            "SELECT MAX(version_number) FROM resume_versions"
+        ).fetchone()[0]
+
+        if last_version is None:
+            version = 1
+        else:
+            version = last_version + 1
+
+        # Insert new snapshot
+        conn.execute("""
+        INSERT INTO resume_versions
+        (name, skills, education, experience, version_number)
+        VALUES (?, ?, ?, ?, ?)
+        """, (name, skills, education, experience, version))
+
+        conn.commit()
+        conn.close()
+
+        return f"Resume Saved Successfully! Version {version}"
+
+    return render_template('resume.html')
+
 if __name__ == '__main__':
-    app.run(debug=True)   
+    app.run(debug=True)
