@@ -14,6 +14,22 @@
 
 <hr>
 
+<form method="GET" action="/versions">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search by name"
+    >
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
+
+<br>
+
 <table border="1" cellpadding="10">
 
 <tr>
@@ -21,6 +37,7 @@
     <th>Name</th>
     <th>Skills</th>
     <th>Restore</th>
+    <th>Delete</th>
 </tr>
 
 {% for resume in resumes %}
@@ -33,7 +50,13 @@
 
     <td>
         <a href="/restore/{{ resume[0] }}">
-            Restore Version
+            Restore
+        </a>
+    </td>
+
+    <td>
+        <a href="/delete/{{ resume[0] }}">
+            Delete
         </a>
     </td>
 

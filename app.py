@@ -120,7 +120,7 @@ def resume():
         else:
             version = last_version + 1
 
-        # Save new version snapshot
+        # Save new snapshot
         conn.execute("""
         INSERT INTO resume_versions
         (name, skills, education, experience, version_number)
@@ -134,16 +134,28 @@ def resume():
 
     return render_template('resume.html')
 
-# View all versions
+# View all versions + search
 @app.route('/versions')
 def versions():
 
+    search = request.args.get('search')
+
     conn = get_db()
 
-    resumes = conn.execute("""
-    SELECT * FROM resume_versions
-    ORDER BY version_number DESC
-    """).fetchall()
+    if search:
+
+        resumes = conn.execute("""
+        SELECT * FROM resume_versions
+        WHERE name LIKE ?
+        ORDER BY version_number DESC
+        """, ('%' + search + '%',)).fetchall()
+
+    else:
+
+        resumes = conn.execute("""
+        SELECT * FROM resume_versions
+        ORDER BY version_number DESC
+        """).fetchall()
 
     conn.close()
 
@@ -192,6 +204,22 @@ def restore(id):
     </body>
     </html>
     """
+
+# Delete version
+@app.route('/delete/<int:id>')
+def delete(id):
+
+    conn = get_db()
+
+    conn.execute("""
+    DELETE FROM resume_versions
+    WHERE id=?
+    """, (id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect('/versions')
 
 if __name__ == '__main__':
     app.run(debug=True)
