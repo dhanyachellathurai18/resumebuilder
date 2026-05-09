@@ -1,70 +1,85 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Resume Builder</title>
 </head>
+
 <body>
 
-<h1>Create Resume</h1>
+    <h1>Create Resume</h1>
+    <hr>
 
-<hr>
+    <form method="POST" enctype="multipart/form-data">
 
-<form method="POST" enctype="multipart/form-data">
+        <input 
+            type="text"
+            name="name"
+            placeholder="Enter Name"
+            required
+        >
 
-    <input
-        type="text"
-        name="name"
-        placeholder="Enter Name"
-        required
-    >
+        <br><br>
 
-    <br><br>
+        <textarea
+            name="skills"
+            placeholder="Enter Skills"
+            required
+        ></textarea>
 
-    <textarea
-        name="skills"
-        placeholder="Enter Skills"
-        required
-    ></textarea>
+        <br><br>
 
-    <br><br>
+        <textarea
+            name="education"
+            placeholder="Enter Education"
+            required
+        ></textarea>
 
-    <textarea
-        name="education"
-        placeholder="Enter Education"
-        required
-    ></textarea>
+        <br><br>
 
-    <br><br>
+        <textarea
+            name="experience"
+            placeholder="Enter Experience"
+            required
+        ></textarea>
 
-    <textarea
-        name="experience"
-        placeholder="Enter Experience"
-        required
-    ></textarea>
+        <br><br>
 
-    <br><br>
+        <!-- Template Selection -->
+        <label>Select Template:</label>
 
-    <label>Upload Profile Photo:</label>
+        <select name="template" required>
+            <option value="Modern">Modern</option>
+            <option value="Professional">Professional</option>
+            <option value="Classic">Classic</option>
+        </select>
 
-    <input
-        type="file"
-        name="photo"
-        required
-    >
+        <br><br>
 
-    <br><br>
+        <!-- Photo Upload -->
+        <label>Upload Profile Photo:</label>
 
-    <button type="submit">
-        Save Resume
-    </button>
+        <input 
+            type="file"
+            name="photo"
+            accept="image/*"
+            required
+        >
 
-</form>
+        <br><br>
 
-<br>
+        <button type="submit">
+            Save Resume
+        </button>
 
-<a href="/dashboard">
-    Back to Dashboard
-</a>
+    </form>
+
+    <br>
+
+    <a href="/dashboard">
+        Back to Dashboard
+    </a>
 
 </body>
+
 </html>

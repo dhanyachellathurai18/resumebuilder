@@ -39,6 +39,7 @@ def create_table():
         education TEXT,
         experience TEXT,
         photo TEXT,
+        template TEXT,
         version_number INTEGER
     )
     """)
@@ -119,6 +120,9 @@ def resume():
         education = request.form['education']
         experience = request.form['experience']
 
+        # Template feature
+        template = request.form['template']
+
         # Photo upload
         photo = request.files['photo']
 
@@ -147,14 +151,15 @@ def resume():
         # Save resume snapshot
         conn.execute("""
         INSERT INTO resume_versions
-        (name, skills, education, experience, photo, version_number)
-        VALUES (?, ?, ?, ?, ?, ?)
+        (name, skills, education, experience, photo, template, version_number)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
             name,
             skills,
             education,
             experience,
             filename,
+            template,
             version
         ))
 
@@ -235,7 +240,9 @@ def restore(id):
 
     <p><b>Experience:</b> {resume[4]}</p>
 
-    <p><b>Version:</b> {resume[6]}</p>
+    <p><b>Template:</b> {resume[6]}</p>
+
+    <p><b>Version:</b> {resume[7]}</p>
 
     <br>
 
@@ -277,7 +284,7 @@ def download(id):
     conn.close()
 
     content = f"""
-Resume Version: {resume[6]}
+Resume Version: {resume[7]}
 
 Name:
 {resume[1]}
@@ -290,12 +297,15 @@ Education:
 
 Experience:
 {resume[4]}
+
+Template:
+{resume[6]}
 """
 
     response = make_response(content)
 
     response.headers["Content-Disposition"] = (
-        f"attachment; filename=resume_version_{resume[6]}.txt"
+        f"attachment; filename=resume_version_{resume[7]}.txt"
     )
 
     response.headers["Content-type"] = "text/plain"
@@ -319,19 +329,43 @@ def pdf(id):
 
     p = canvas.Canvas(buffer)
 
-    # Resume content
-    p.drawString(100, 800, f"Resume Version: {resume[6]}")
+    # Different Template Designs
 
-    p.drawString(100, 760, f"Name: {resume[1]}")
+    if resume[6] == "Modern":
+
+        p.setFont("Helvetica-Bold", 20)
+
+        p.drawString(180, 820, "MODERN RESUME")
+
+    elif resume[6] == "Professional":
+
+        p.setFont("Times-Bold", 18)
+
+        p.drawString(170, 820, "PROFESSIONAL RESUME")
+
+    else:
+
+        p.setFont("Courier-Bold", 18)
+
+        p.drawString(180, 820, "CLASSIC RESUME")
+
+    # Resume content
+    p.setFont("Helvetica", 12)
+
+    p.drawString(100, 780, f"Resume Version: {resume[7]}")
+
+    p.drawString(100, 750, f"Name: {resume[1]}")
 
     p.drawString(100, 720, "Skills:")
     p.drawString(120, 700, resume[2])
 
-    p.drawString(100, 660, "Education:")
-    p.drawString(120, 640, resume[3])
+    p.drawString(100, 670, "Education:")
+    p.drawString(120, 650, resume[3])
 
-    p.drawString(100, 600, "Experience:")
-    p.drawString(120, 580, resume[4])
+    p.drawString(100, 620, "Experience:")
+    p.drawString(120, 600, resume[4])
+
+    p.drawString(100, 570, f"Template: {resume[6]}")
 
     # Add profile image
     image_path = os.path.join(
@@ -339,13 +373,16 @@ def pdf(id):
         resume[5]
     )
 
-    p.drawImage(
-        image_path,
-        350,
-        650,
-        width=120,
-        height=120
-    )
+    try:
+        p.drawImage(
+            image_path,
+            350,
+            650,
+            width=120,
+            height=120
+        )
+    except:
+        pass
 
     p.save()
 
@@ -358,7 +395,7 @@ def pdf(id):
     response.headers['Content-Type'] = 'application/pdf'
 
     response.headers['Content-Disposition'] = (
-        f'attachment; filename=resume_{resume[6]}.pdf'
+        f'attachment; filename=resume_{resume[7]}.pdf'
     )
 
     return response
