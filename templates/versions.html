@@ -5,7 +5,14 @@
 </head>
 <body>
 
-<h2>Saved Resume Versions</h2>
+<h1>Resume Version History</h1>
+
+<hr>
+
+<a href="/dashboard">Dashboard</a> |
+<a href="/resume">Create Resume</a>
+
+<hr>
 
 <table border="1" cellpadding="10">
 
@@ -13,7 +20,7 @@
     <th>Version</th>
     <th>Name</th>
     <th>Skills</th>
-    <th>Action</th>
+    <th>Restore</th>
 </tr>
 
 {% for resume in resumes %}
@@ -26,7 +33,7 @@
 
     <td>
         <a href="/restore/{{ resume[0] }}">
-            Restore
+            Restore Version
         </a>
     </td>
 

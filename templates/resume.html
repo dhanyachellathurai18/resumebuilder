@@ -5,23 +5,34 @@
 </head>
 <body>
 
-<h2>Create Resume</h2>
+<h1>Resume Builder</h1>
+
+<hr>
+
+<a href="/dashboard">Dashboard</a> |
+<a href="/versions">View Versions</a>
+
+<hr>
 
 <form method="POST">
 
-    Name:
-    <input type="text" name="name"><br><br>
+    <h3>Name</h3>
+    <input type="text" name="name" required>
 
-    Skills:
-    <textarea name="skills"></textarea><br><br>
+    <h3>Skills</h3>
+    <textarea name="skills" rows="5" cols="40"></textarea>
 
-    Education:
-    <textarea name="education"></textarea><br><br>
+    <h3>Education</h3>
+    <textarea name="education" rows="5" cols="40"></textarea>
 
-    Experience:
-    <textarea name="experience"></textarea><br><br>
+    <h3>Experience</h3>
+    <textarea name="experience" rows="5" cols="40"></textarea>
 
-    <button type="submit">Save Resume</button>
+    <br><br>
+
+    <button type="submit">
+        Save Resume
+    </button>
 
 </form>
 

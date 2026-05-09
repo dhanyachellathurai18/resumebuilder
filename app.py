@@ -7,7 +7,7 @@ app = Flask(__name__)
 def get_db():
     return sqlite3.connect("database.db")
 
-# Create tables
+# Create database tables
 def create_table():
 
     conn = get_db()
@@ -63,7 +63,7 @@ def register():
         conn.commit()
         conn.close()
 
-        return "Registered Successfully!"
+        return redirect('/login')
 
     return render_template('register.html')
 
@@ -86,11 +86,16 @@ def login():
         conn.close()
 
         if user:
-            return redirect('/resume')
+            return redirect('/dashboard')
         else:
             return "Invalid Credentials!"
 
     return render_template('login.html')
+
+# Dashboard page
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 # Resume Builder Page
 @app.route('/resume', methods=['GET', 'POST'])
@@ -161,7 +166,12 @@ def restore(id):
     conn.close()
 
     return f"""
-    <h2>Restored Resume</h2>
+    <html>
+    <body>
+
+    <h1>Restored Resume</h1>
+
+    <hr>
 
     <p><b>Name:</b> {resume[1]}</p>
 
@@ -172,6 +182,15 @@ def restore(id):
     <p><b>Experience:</b> {resume[4]}</p>
 
     <p><b>Version:</b> {resume[5]}</p>
+
+    <br>
+
+    <a href="/versions">
+        Back to Versions
+    </a>
+
+    </body>
+    </html>
     """
 
 if __name__ == '__main__':
