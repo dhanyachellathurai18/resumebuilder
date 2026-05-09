@@ -38,7 +38,8 @@
     <th>Skills</th>
     <th>Restore</th>
     <th>Delete</th>
-    <th>Download</th>
+    <th>TXT</th>
+    <th>PDF</th>
 </tr>
 
 {% for resume in resumes %}
@@ -63,7 +64,13 @@
 
     <td>
         <a href="/download/{{ resume[0] }}">
-            Download
+            TXT
+        </a>
+    </td>
+
+    <td>
+        <a href="/pdf/{{ resume[0] }}">
+            PDF
         </a>
     </td>
 

@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, make_response
+from reportlab.pdfgen import canvas
+from io import BytesIO
 import sqlite3
 
 app = Flask(__name__)
@@ -221,7 +223,7 @@ def delete(id):
 
     return redirect('/versions')
 
-# Download resume
+# Download resume as TXT
 @app.route('/download/<int:id>')
 def download(id):
 
@@ -257,6 +259,52 @@ Experience:
     )
 
     response.headers["Content-type"] = "text/plain"
+
+    return response
+
+# Download resume as PDF
+@app.route('/pdf/<int:id>')
+def pdf(id):
+
+    conn = get_db()
+
+    resume = conn.execute("""
+    SELECT * FROM resume_versions
+    WHERE id=?
+    """, (id,)).fetchone()
+
+    conn.close()
+
+    buffer = BytesIO()
+
+    p = canvas.Canvas(buffer)
+
+    p.drawString(100, 800, f"Resume Version: {resume[5]}")
+
+    p.drawString(100, 760, f"Name: {resume[1]}")
+
+    p.drawString(100, 720, "Skills:")
+    p.drawString(120, 700, resume[2])
+
+    p.drawString(100, 660, "Education:")
+    p.drawString(120, 640, resume[3])
+
+    p.drawString(100, 600, "Experience:")
+    p.drawString(120, 580, resume[4])
+
+    p.save()
+
+    pdf_data = buffer.getvalue()
+
+    buffer.close()
+
+    response = make_response(pdf_data)
+
+    response.headers['Content-Type'] = 'application/pdf'
+
+    response.headers['Content-Disposition'] = (
+        f'attachment; filename=resume_{resume[5]}.pdf'
+    )
 
     return response
 
