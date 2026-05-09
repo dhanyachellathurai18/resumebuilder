@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, make_response
 import sqlite3
 
 app = Flask(__name__)
@@ -220,6 +220,45 @@ def delete(id):
     conn.close()
 
     return redirect('/versions')
+
+# Download resume
+@app.route('/download/<int:id>')
+def download(id):
+
+    conn = get_db()
+
+    resume = conn.execute("""
+    SELECT * FROM resume_versions
+    WHERE id=?
+    """, (id,)).fetchone()
+
+    conn.close()
+
+    content = f"""
+Resume Version: {resume[5]}
+
+Name:
+{resume[1]}
+
+Skills:
+{resume[2]}
+
+Education:
+{resume[3]}
+
+Experience:
+{resume[4]}
+"""
+
+    response = make_response(content)
+
+    response.headers["Content-Disposition"] = (
+        f"attachment; filename=resume_version_{resume[5]}.txt"
+    )
+
+    response.headers["Content-type"] = "text/plain"
+
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
