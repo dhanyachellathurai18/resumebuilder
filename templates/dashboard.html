@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Dashboard</title>
 </head>
+
 <body>
 
 <h1>Resume Builder Dashboard</h1>
@@ -11,21 +13,65 @@
 
 <h3>Welcome!</h3>
 
+<!-- Statistics -->
+
+<h3>Total Users: {{ total_users }}</h3>
+
+<h3>Total Resumes Created: {{ total_resumes }}</h3>
+
+<hr>
+
 <a href="/resume">
-    <button>Create Resume</button>
+    <button>
+        Create Resume
+    </button>
 </a>
 
 <br><br>
 
 <a href="/versions">
-    <button>View Resume Versions</button>
+    <button>
+        View Resume Versions
+    </button>
 </a>
 
 <br><br>
 
 <a href="/login">
-    <button>Logout</button>
+    <button>
+        Logout
+    </button>
 </a>
+
+<hr>
+
+<h3>Project Features</h3>
+
+<ul>
+
+    <li>User Registration & Login</li>
+
+    <li>Resume Builder</li>
+
+    <li>Profile Photo Upload</li>
+
+    <li>Resume Version Control</li>
+
+    <li>Search Resume Versions</li>
+
+    <li>Delete Resume Versions</li>
+
+    <li>Restore Old Resume</li>
+
+    <li>TXT Resume Download</li>
+
+    <li>PDF Resume Download</li>
+
+    <li>Multiple Resume Templates</li>
+
+    <li>Dashboard Statistics</li>
+
+</ul>
 
 </body>
 </html>

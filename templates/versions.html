@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Resume Versions</title>
 </head>
+
 <body>
 
 <h1>Resume Version History</h1>
@@ -33,9 +35,11 @@
 <table border="1" cellpadding="10">
 
 <tr>
+    <th>Photo</th>
     <th>Version</th>
     <th>Name</th>
     <th>Skills</th>
+    <th>Template</th>
     <th>Restore</th>
     <th>Delete</th>
     <th>TXT</th>
@@ -46,9 +50,31 @@
 
 <tr>
 
-    <td>{{ resume[5] }}</td>
+    <td>
+
+        {% if resume[5] %}
+
+        <img
+            src="/static/uploads/{{ resume[5] }}"
+            width="80"
+            height="80"
+        >
+
+        {% else %}
+
+        No Image
+
+        {% endif %}
+
+    </td>
+
+    <td>{{ resume[7] }}</td>
+
     <td>{{ resume[1] }}</td>
+
     <td>{{ resume[2] }}</td>
+
+    <td>{{ resume[6] }}</td>
 
     <td>
         <a href="/restore/{{ resume[0] }}">

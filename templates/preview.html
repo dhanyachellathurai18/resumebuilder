@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Resume Preview</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            background-color: #f0f2f5;
+            padding: 40px;
+        }
+
+        .resume-box{
+            width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+
+        img{
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+        }
+
+        h1{
+            color: darkblue;
+        }
+
+        hr{
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="resume-box">
+
+    <center>
+
+        <img
+        src="/static/uploads/{{ resume[5] }}"
+        >
+
+        <h1>{{ resume[1] }}</h1>
+
+        <p>
+            <b>Template:</b>
+            {{ resume[6] }}
+        </p>
+
+    </center>
+
+    <hr>
+
+    <h2>Skills</h2>
+
+    <p>{{ resume[2] }}</p>
+
+    <h2>Education</h2>
+
+    <p>{{ resume[3] }}</p>
+
+    <h2>Experience</h2>
+
+    <p>{{ resume[4] }}</p>
+
+    <hr>
+
+    <h3>
+        Resume Version:
+        {{ resume[7] }}
+    </h3>
+
+    <a href="/versions">
+        Back
+    </a>
+
+</div>
+
+</body>
+</html>

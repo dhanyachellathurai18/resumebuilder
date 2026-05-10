@@ -11,6 +11,9 @@ UPLOAD_FOLDER = 'static/uploads'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Create upload folder automatically
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Database connection
 def get_db():
     return sqlite3.connect("database.db")
@@ -200,6 +203,24 @@ def versions():
         resumes=resumes
     )
 
+# Resume Preview Page
+@app.route('/preview/<int:id>')
+def preview(id):
+
+    conn = get_db()
+
+    resume = conn.execute("""
+    SELECT * FROM resume_versions
+    WHERE id=?
+    """, (id,)).fetchone()
+
+    conn.close()
+
+    return render_template(
+        'preview.html',
+        resume=resume
+    )
+
 # Restore old version
 @app.route('/restore/<int:id>')
 def restore(id):
@@ -330,26 +351,22 @@ def pdf(id):
     p = canvas.Canvas(buffer)
 
     # Different Template Designs
-
     if resume[6] == "Modern":
 
         p.setFont("Helvetica-Bold", 20)
-
         p.drawString(180, 820, "MODERN RESUME")
 
     elif resume[6] == "Professional":
 
         p.setFont("Times-Bold", 18)
-
-        p.drawString(170, 820, "PROFESSIONAL RESUME")
+        p.drawString(160, 820, "PROFESSIONAL RESUME")
 
     else:
 
         p.setFont("Courier-Bold", 18)
-
         p.drawString(180, 820, "CLASSIC RESUME")
 
-    # Resume content
+    # Normal text
     p.setFont("Helvetica", 12)
 
     p.drawString(100, 780, f"Resume Version: {resume[7]}")
@@ -374,6 +391,7 @@ def pdf(id):
     )
 
     try:
+
         p.drawImage(
             image_path,
             350,
@@ -381,6 +399,7 @@ def pdf(id):
             width=120,
             height=120
         )
+
     except:
         pass
 
