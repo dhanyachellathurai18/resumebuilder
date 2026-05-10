@@ -110,7 +110,24 @@ def login():
 # Dashboard page
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+
+    conn = get_db()
+
+    total_users = conn.execute("""
+    SELECT COUNT(*) FROM users
+    """).fetchone()[0]
+
+    total_resumes = conn.execute("""
+    SELECT COUNT(*) FROM resume_versions
+    """).fetchone()[0]
+
+    conn.close()
+
+    return render_template(
+        'dashboard.html',
+        total_users=total_users,
+        total_resumes=total_resumes
+    )
 
 # Resume Builder Page
 @app.route('/resume', methods=['GET', 'POST'])
@@ -131,13 +148,19 @@ def resume():
 
         filename = photo.filename
 
-        # Save image
-        photo.save(
-            os.path.join(
-                app.config['UPLOAD_FOLDER'],
-                filename
+        # Save image safely
+        if filename != "":
+
+            photo.save(
+                os.path.join(
+                    app.config['UPLOAD_FOLDER'],
+                    filename
+                )
             )
-        )
+
+        else:
+
+            filename = "noimage.png"
 
         conn = get_db()
 
@@ -390,7 +413,7 @@ def pdf(id):
         resume[5]
     )
 
-    try:
+    if os.path.exists(image_path):
 
         p.drawImage(
             image_path,
@@ -399,9 +422,6 @@ def pdf(id):
             width=120,
             height=120
         )
-
-    except:
-        pass
 
     p.save()
 

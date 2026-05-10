@@ -26,15 +26,43 @@
             width: 130px;
             height: 130px;
             border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid darkblue;
         }
 
         h1{
             color: darkblue;
+            margin-top: 10px;
+        }
+
+        h2{
+            color: #333;
         }
 
         hr{
             margin-top: 20px;
             margin-bottom: 20px;
+        }
+
+        .template{
+            color: green;
+            font-weight: bold;
+        }
+
+        .version{
+            color: gray;
+        }
+
+        .btn{
+            text-decoration: none;
+            background-color: darkblue;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .btn:hover{
+            background-color: black;
         }
 
     </style>
@@ -49,12 +77,13 @@
 
         <img
         src="/static/uploads/{{ resume[5] }}"
+        alt="Profile Photo"
         >
 
         <h1>{{ resume[1] }}</h1>
 
-        <p>
-            <b>Template:</b>
+        <p class="template">
+            Template :
             {{ resume[6] }}
         </p>
 
@@ -66,9 +95,13 @@
 
     <p>{{ resume[2] }}</p>
 
+    <hr>
+
     <h2>Education</h2>
 
     <p>{{ resume[3] }}</p>
+
+    <hr>
 
     <h2>Experience</h2>
 
@@ -76,13 +109,18 @@
 
     <hr>
 
-    <h3>
-        Resume Version:
+    <h3 class="version">
+        Resume Version :
         {{ resume[7] }}
     </h3>
 
-    <a href="/versions">
-        Back
+    <br>
+
+    <a
+    href="/versions"
+    class="btn"
+    >
+        Back to Versions
     </a>
 
 </div>
