@@ -11,10 +11,63 @@
             font-family: Arial;
             background-color: #f0f2f5;
             padding: 30px;
+            margin: 0;
         }
 
         h1{
             color: darkblue;
+            text-align: center;
+        }
+
+        .container{
+            width: 95%;
+            margin: auto;
+        }
+
+        .top-links{
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .top-links a{
+            text-decoration: none;
+            color: white;
+            background-color: darkblue;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .top-links a:hover{
+            background-color: black;
+        }
+
+        .search-box{
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        input{
+            padding: 10px;
+            width: 260px;
+            border-radius: 5px;
+            border: 1px solid gray;
+        }
+
+        button{
+            padding: 10px 18px;
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover{
+            background-color: black;
         }
 
         table{
@@ -22,63 +75,82 @@
             border-collapse: collapse;
             background-color: white;
             box-shadow: 0px 0px 10px lightgray;
+            overflow: hidden;
+            border-radius: 10px;
         }
 
         th{
             background-color: darkblue;
             color: white;
-            padding: 12px;
+            padding: 14px;
         }
 
         td{
             text-align: center;
-            padding: 12px;
+            padding: 14px;
         }
 
         tr:nth-child(even){
-            background-color: #f9f9f9;
+            background-color: #f8f8f8;
+        }
+
+        tr:hover{
+            background-color: #eef3ff;
         }
 
         img{
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid darkblue;
+            border: 3px solid darkblue;
         }
 
-        a{
+        .action-btn{
             text-decoration: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .preview{
+            background-color: #17a2b8;
+        }
+
+        .restore{
+            background-color: #28a745;
+        }
+
+        .delete{
+            background-color: #dc3545;
+        }
+
+        .txt{
+            background-color: #6c757d;
+        }
+
+        .pdf{
+            background-color: #fd7e14;
+        }
+
+        .action-btn:hover{
+            opacity: 0.8;
+        }
+
+        .template-box{
+            background-color: #eef2ff;
+            padding: 6px 10px;
+            border-radius: 20px;
             color: darkblue;
             font-weight: bold;
         }
 
-        a:hover{
-            color: black;
-        }
-
-        .top-links{
-            margin-bottom: 20px;
-        }
-
-        .search-box{
-            margin-bottom: 20px;
-        }
-
-        input{
-            padding: 8px;
-            width: 250px;
-        }
-
-        button{
-            padding: 8px 15px;
-            background-color: darkblue;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover{
-            background-color: black;
+        .score-box{
+            background-color: #d4edda;
+            color: #155724;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
         }
 
     </style>
@@ -87,19 +159,23 @@
 
 <body>
 
+<div class="container">
+
 <h1>Resume Version History</h1>
 
 <hr>
 
 <div class="top-links">
 
-    <a href="/dashboard">Dashboard</a> |
+    <a href="/dashboard">
+        Dashboard
+    </a>
 
-    <a href="/resume">Create Resume</a>
+    <a href="/resume">
+        Create Resume
+    </a>
 
 </div>
-
-<hr>
 
 <div class="search-box">
 
@@ -119,7 +195,7 @@
 
 </div>
 
-<table border="1">
+<table>
 
 <tr>
     <th>Photo</th>
@@ -127,6 +203,7 @@
     <th>Name</th>
     <th>Skills</th>
     <th>Template</th>
+    <th>Score</th>
     <th>Preview</th>
     <th>Restore</th>
     <th>Delete</th>
@@ -156,40 +233,71 @@
 
     </td>
 
-    <td>{{ resume[7] }}</td>
-
-    <td>{{ resume[1] }}</td>
-
-    <td>{{ resume[2] }}</td>
-
-    <td>{{ resume[6] }}</td>
+    <td>
+        {{ resume[7] }}
+    </td>
 
     <td>
-        <a href="/preview/{{ resume[0] }}">
+        {{ resume[1] }}
+    </td>
+
+    <td>
+        {{ resume[2] }}
+    </td>
+
+    <td>
+        <span class="template-box">
+            {{ resume[6] }}
+        </span>
+    </td>
+
+    <td>
+        <span class="score-box">
+            {{ resume[8] }}/100
+        </span>
+    </td>
+
+    <td>
+        <a
+            class="action-btn preview"
+            href="/preview/{{ resume[0] }}"
+        >
             Preview
         </a>
     </td>
 
     <td>
-        <a href="/restore/{{ resume[0] }}">
+        <a
+            class="action-btn restore"
+            href="/restore/{{ resume[0] }}"
+        >
             Restore
         </a>
     </td>
 
     <td>
-        <a href="/delete/{{ resume[0] }}">
+        <a
+            class="action-btn delete"
+            href="/delete/{{ resume[0] }}"
+        >
             Delete
         </a>
     </td>
 
     <td>
-        <a href="/download/{{ resume[0] }}">
+        <a
+            class="action-btn txt"
+            href="/download/{{ resume[0] }}"
+        >
             TXT
         </a>
     </td>
 
     <td>
-        <a href="/pdf/{{ resume[0] }}">
+        <a
+            class="action-btn pdf"
+            href="/pdf/{{ resume[0] }}"
+        >
             PDF
         </a>
     </td>
@@ -199,6 +307,8 @@
 {% endfor %}
 
 </table>
+
+</div>
 
 </body>
 </html>
