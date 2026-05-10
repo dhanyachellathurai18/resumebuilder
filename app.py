@@ -1,18 +1,19 @@
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, session
 from reportlab.pdfgen import canvas
 from io import BytesIO
 import sqlite3
 import os
+import time
+import textwrap
 
 app = Flask(__name__)
+app.secret_key = "resume_secret_key"
 
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# =========================
-# DATABASE
-# =========================
+# ================= DB =================
 def get_db():
     conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
@@ -26,7 +27,7 @@ def create_table():
     CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        email TEXT,
+        email TEXT UNIQUE,
         password TEXT
     )
     """)
@@ -56,10 +57,11 @@ def create_table():
 
 create_table()
 
-# =========================
-# SCORE SYSTEM
-# =========================
+# ================= SCORE =================
 def calculate_score(skills, education, experience, photo):
+    skills = skills or ""
+    education = education or ""
+    experience = experience or ""
 
     score = 0
     score += min(len(skills)//2, 35)
@@ -79,33 +81,66 @@ def get_rank(score):
         return "Good"
     elif score >= 50:
         return "Average"
-    else:
-        return "Poor"
+    return "Poor"
 
-# =========================
-# HOME
-# =========================
+# ================= HOME =================
 @app.route('/')
 def home():
     return redirect('/login')
 
 
+# ================= LOGIN =================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
     if request.method == 'POST':
-        return redirect('/dashboard')
-    return render_template('login.html')
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        conn = get_db()
+        user = conn.execute(
+            "SELECT * FROM users WHERE email=? AND password=?",
+            (email, password)
+        ).fetchone()
+        conn.close()
+
+        if user:
+            session["user"] = user["name"]
+            return redirect("/dashboard")
+        return "Invalid login ❌"
+
+    return render_template("login.html")
 
 
+# ================= REGISTER =================
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
     if request.method == 'POST':
-        return redirect('/login')
-    return render_template('register.html')
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO users (name, email, password) VALUES (?,?,?)",
+            (name, email, password)
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect("/login")
+
+    return render_template("register.html")
 
 
+# ================= DASHBOARD =================
 @app.route('/dashboard')
 def dashboard():
+
+    if "user" not in session:
+        return redirect("/login")
+
     conn = get_db()
 
     total_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
@@ -117,32 +152,31 @@ def dashboard():
                            total_users=total_users,
                            total_resumes=total_resumes)
 
-# =========================
-# CREATE RESUME
-# =========================
+
+# ================= CREATE RESUME =================
 @app.route('/resume', methods=['GET', 'POST'])
 def resume():
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        name = request.form.get('name')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        linkedin = request.form.get('linkedin')
-        objective = request.form.get('objective')
-        skills = request.form.get('skills')
-        education = request.form.get('education')
-        experience = request.form.get('experience')
-        location = request.form.get('location')
-        template = request.form.get('template')
+        name = request.form.get("name")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        linkedin = request.form.get("linkedin")
+        objective = request.form.get("objective")
+        skills = request.form.get("skills")
+        education = request.form.get("education")
+        experience = request.form.get("experience")
+        location = request.form.get("location")
+        template = request.form.get("template")
 
-        photo = request.files.get('photo')
+        photo = request.files.get("photo")
 
-        if photo and photo.filename != "":
-            filename = photo.filename
-            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        else:
-            filename = "noimage.png"
+        filename = "noimage.png"
+
+        if photo and photo.filename:
+            filename = str(int(time.time())) + "_" + photo.filename
+            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         score = calculate_score(skills, education, experience, filename)
 
@@ -169,33 +203,17 @@ def resume():
         conn.commit()
         conn.close()
 
-        return redirect('/versions')
+        return redirect("/versions")
 
-    return render_template('resume.html')
+    return render_template("resume.html")
 
 
-# =========================
-# VERSION HISTORY + SEARCH FIXED
-# =========================
+# ================= VERSIONS =================
 @app.route('/versions')
 def versions():
 
-    search = request.args.get('search', '').strip()
-
     conn = get_db()
-
-    if search:
-        resumes = conn.execute("""
-            SELECT * FROM resume_versions
-            WHERE name LIKE ? OR skills LIKE ? OR email LIKE ?
-            ORDER BY id DESC
-        """, ('%' + search + '%', '%' + search + '%', '%' + search + '%')).fetchall()
-    else:
-        resumes = conn.execute("""
-            SELECT * FROM resume_versions
-            ORDER BY id DESC
-        """).fetchall()
-
+    resumes = conn.execute("SELECT * FROM resume_versions ORDER BY id DESC").fetchall()
     conn.close()
 
     data = [(r, get_rank(r["score"])) for r in resumes]
@@ -203,9 +221,7 @@ def versions():
     return render_template("versions.html", resume_data=data)
 
 
-# =========================
-# PREVIEW
-# =========================
+# ================= PREVIEW =================
 @app.route('/preview/<int:id>')
 def preview(id):
 
@@ -218,9 +234,7 @@ def preview(id):
                            rank=get_rank(resume["score"]))
 
 
-# =========================
-# DELETE
-# =========================
+# ================= DELETE =================
 @app.route('/delete/<int:id>')
 def delete(id):
 
@@ -229,12 +243,19 @@ def delete(id):
     conn.commit()
     conn.close()
 
-    return redirect('/versions')
+    return redirect("/versions")
 
 
-# =========================
-# PDF (CLEAN + IMAGE FIXED)
-# =========================
+# ================= PDF (FINAL FIXED + CLEAN OUTPUT) =================
+def draw_wrapped_text(canvas_obj, text, x, y, max_chars=95, line_height=14):
+    """Proper text wrapping FIX"""
+    lines = textwrap.wrap(text or "", max_chars)
+    for line in lines:
+        canvas_obj.drawString(x, y, line)
+        y -= line_height
+    return y
+
+
 @app.route('/pdf/<int:id>')
 def pdf(id):
 
@@ -245,62 +266,48 @@ def pdf(id):
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
 
-    # HEADER
-    p.setFont("Helvetica-Bold", 20)
-    p.drawString(200, 800, "AI RESUME")
+    width, height = 595, 842
 
-    # IMAGE
+    # TITLE BAR
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(220, height - 50, "AI RESUME")
+
+    # IMAGE FIX
     if resume["photo"] and resume["photo"] != "noimage.png":
-        img_path = os.path.join("static/uploads", resume["photo"])
-        try:
-            p.drawImage(img_path, 450, 720, width=90, height=90)
-        except:
-            pass
+        img_path = os.path.join(app.config["UPLOAD_FOLDER"], resume["photo"])
+        if os.path.exists(img_path):
+            p.drawImage(img_path, 450, height - 140, width=90, height=90, mask='auto')
 
     # NAME
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(50, 760, resume["name"])
+    p.drawString(50, height - 100, resume["name"])
 
     # CONTACT
-    p.setFont("Helvetica", 11)
-    p.drawString(50, 735, f"Email: {resume['email']}")
-    p.drawString(50, 720, f"Phone: {resume['phone']}")
-    p.drawString(50, 705, f"LinkedIn: {resume['linkedin']}")
-    p.drawString(50, 690, f"Location: {resume['location']}")
+    p.setFont("Helvetica", 10)
+    p.drawString(50, height - 130, f"Email: {resume['email']}")
+    p.drawString(50, height - 145, f"Phone: {resume['phone']}")
+    p.drawString(50, height - 160, f"LinkedIn: {resume['linkedin']}")
+    p.drawString(50, height - 175, f"Location: {resume['location']}")
 
-    p.line(50, 680, 550, 680)
+    y = height - 210
 
-    # OBJECTIVE
-    p.setFont("Helvetica-Bold", 13)
-    p.drawString(50, 655, "Objective")
-    text = p.beginText(50, 640)
-    text.textLines(resume["objective"] or "")
-    p.drawText(text)
+    def section(title, content):
+        nonlocal y
+        p.setFont("Helvetica-Bold", 13)
+        p.drawString(50, y, title)
+        y -= 18
 
-    # SKILLS
-    p.setFont("Helvetica-Bold", 13)
-    p.drawString(50, 600, "Skills")
-    text = p.beginText(50, 585)
-    text.textLines(resume["skills"] or "")
-    p.drawText(text)
+        p.setFont("Helvetica", 10)
+        y = draw_wrapped_text(p, content, 60, y, 95)
+        y -= 10
 
-    # EDUCATION
-    p.setFont("Helvetica-Bold", 13)
-    p.drawString(50, 545, "Education")
-    text = p.beginText(50, 530)
-    text.textLines(resume["education"] or "")
-    p.drawText(text)
+    section("OBJECTIVE", resume["objective"])
+    section("SKILLS", resume["skills"])
+    section("EDUCATION", resume["education"])
+    section("EXPERIENCE", resume["experience"])
 
-    # EXPERIENCE
-    p.setFont("Helvetica-Bold", 13)
-    p.drawString(50, 490, "Experience")
-    text = p.beginText(50, 475)
-    text.textLines(resume["experience"] or "")
-    p.drawText(text)
-
-    # SCORE
-    p.setFont("Helvetica-Bold", 11)
-    p.drawString(50, 430, f"AI Score: {resume['score']}/100")
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(50, 80, f"AI SCORE: {resume['score']}/100")
 
     p.save()
 
@@ -308,8 +315,8 @@ def pdf(id):
     buffer.close()
 
     response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=resume.pdf'
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "attachment; filename=resume.pdf"
 
     return response
 
