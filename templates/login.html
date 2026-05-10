@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+<title>Login</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<h2>Login</h2>
+<body class="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
 
-<form method="POST">
+<div class="bg-white/20 backdrop-blur-xl p-8 rounded-2xl shadow-2xl w-96 border border-white/30">
 
-    Email:
-    <input type="email" name="email"><br><br>
+<h2 class="text-white text-3xl font-bold text-center mb-6">Welcome Back</h2>
 
-    Password:
-    <input type="password" name="password"><br><br>
+<form method="POST" class="space-y-4">
 
-    <button type="submit">Login</button>
+<input class="w-full p-3 rounded-lg bg-white/80" type="email" name="email" placeholder="Email">
+
+<input class="w-full p-3 rounded-lg bg-white/80" type="password" name="password" placeholder="Password">
+
+<button class="w-full bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition">
+Login
+</button>
 
 </form>
+
+<p class="text-center text-white mt-4 text-sm">
+New user? <a href="/register" class="underline">Register</a>
+</p>
+
+</div>
 
 </body>
 </html>

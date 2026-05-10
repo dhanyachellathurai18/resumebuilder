@@ -2,84 +2,86 @@
 <html>
 
 <head>
-    <title>Resume Builder</title>
+<title>AI Resume Builder</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+    background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
+}
+.glass {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+</style>
 </head>
 
-<body>
+<body class="text-white p-8">
 
-    <h1>Create Resume</h1>
-    <hr>
+<div class="max-w-4xl mx-auto glass p-8 rounded-2xl shadow-2xl">
 
-    <form method="POST" enctype="multipart/form-data">
+<h1 class="text-3xl font-bold text-center mb-6">
+AI Resume Builder 🚀
+</h1>
 
-        <input 
-            type="text"
-            name="name"
-            placeholder="Enter Name"
-            required
-        >
+<form method="POST" enctype="multipart/form-data" id="form" class="space-y-4">
 
-        <br><br>
+<!-- BASIC INFO -->
+<div class="grid grid-cols-2 gap-4">
 
-        <textarea
-            name="skills"
-            placeholder="Enter Skills"
-            required
-        ></textarea>
+<input name="name" placeholder="Full Name" class="p-3 rounded-xl text-black">
 
-        <br><br>
+<input name="email" placeholder="Email" class="p-3 rounded-xl text-black">
 
-        <textarea
-            name="education"
-            placeholder="Enter Education"
-            required
-        ></textarea>
+<input name="phone" placeholder="Phone Number" class="p-3 rounded-xl text-black">
 
-        <br><br>
+<input name="location" placeholder="Location" class="p-3 rounded-xl text-black">
 
-        <textarea
-            name="experience"
-            placeholder="Enter Experience"
-            required
-        ></textarea>
+</div>
 
-        <br><br>
+<!-- LINKS -->
+<div class="grid grid-cols-1 gap-4">
 
-        <!-- Template Selection -->
-        <label>Select Template:</label>
+<input name="linkedin" placeholder="LinkedIn URL" class="p-3 rounded-xl text-black">
 
-        <select name="template" required>
-            <option value="Modern">Modern</option>
-            <option value="Professional">Professional</option>
-            <option value="Classic">Classic</option>
-        </select>
+<textarea name="objective" placeholder="Career Objective / Summary"
+class="p-3 rounded-xl text-black"></textarea>
 
-        <br><br>
+</div>
 
-        <!-- Photo Upload -->
-        <label>Upload Profile Photo:</label>
+<!-- MAIN CONTENT -->
+<textarea name="skills" placeholder="Skills (Python, Java, etc)"
+class="w-full p-3 rounded-xl text-black"></textarea>
 
-        <input 
-            type="file"
-            name="photo"
-            accept="image/*"
-            required
-        >
+<textarea name="education" placeholder="Education"
+class="w-full p-3 rounded-xl text-black"></textarea>
 
-        <br><br>
+<textarea name="experience" placeholder="Experience"
+class="w-full p-3 rounded-xl text-black"></textarea>
 
-        <button type="submit">
-            Save Resume
-        </button>
+<!-- TEMPLATE -->
+<select name="template" class="w-full p-3 rounded-xl text-black">
+<option>AI Modern</option>
+<option>Cyber Glass</option>
+<option>Dark Pro</option>
+</select>
 
-    </form>
+<!-- PHOTO -->
+<input type="file" name="photo" class="w-full">
 
-    <br>
+<!-- BUTTON -->
+<button class="w-full bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-xl hover:scale-105 transition font-bold">
+Generate AI Resume
+</button>
 
-    <a href="/dashboard">
-        Back to Dashboard
-    </a>
+</form>
+
+<p class="text-center text-sm mt-4 text-gray-300">
+Auto-saving every 5 minutes 🤖 | AI-enhanced builder
+</p>
+
+</div>
 
 </body>
-
 </html>

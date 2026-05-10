@@ -2,367 +2,172 @@
 <html>
 
 <head>
-
-    <title>Resume Versions</title>
+    <title>AI Resume Versions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-
-        body{
-            font-family: Arial;
-            background-color: #f0f2f5;
-            padding: 30px;
-            margin: 0;
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
+            min-height: 100vh;
         }
 
-        h1{
-            color: darkblue;
-            text-align: center;
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .container{
-            width: 95%;
-            margin: auto;
+        .row-hover:hover {
+            transform: scale(1.01);
+            transition: 0.2s ease;
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        .top-links{
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .top-links a{
-            text-decoration: none;
-            color: white;
-            background-color: darkblue;
-            padding: 10px 20px;
-            border-radius: 6px;
-            margin: 5px;
-            display: inline-block;
-            font-weight: bold;
-        }
-
-        .top-links a:hover{
-            background-color: black;
-        }
-
-        .search-box{
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        input{
-            padding: 10px;
-            width: 260px;
-            border-radius: 5px;
-            border: 1px solid gray;
-        }
-
-        button{
-            padding: 10px 18px;
-            background-color: darkblue;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover{
-            background-color: black;
-        }
-
-        table{
-            width: 100%;
+        table {
             border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0px 0px 10px lightgray;
-            overflow: hidden;
-            border-radius: 10px;
         }
-
-        th{
-            background-color: darkblue;
-            color: white;
-            padding: 14px;
-        }
-
-        td{
-            text-align: center;
-            padding: 14px;
-        }
-
-        tr:nth-child(even){
-            background-color: #f8f8f8;
-        }
-
-        tr:hover{
-            background-color: #eef3ff;
-        }
-
-        img{
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid darkblue;
-        }
-
-        .action-btn{
-            text-decoration: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .preview{
-            background-color: #17a2b8;
-        }
-
-        .restore{
-            background-color: #28a745;
-        }
-
-        .delete{
-            background-color: #dc3545;
-        }
-
-        .txt{
-            background-color: #6c757d;
-        }
-
-        .pdf{
-            background-color: #fd7e14;
-        }
-
-        .action-btn:hover{
-            opacity: 0.8;
-        }
-
-        .template-box{
-            background-color: #eef2ff;
-            padding: 6px 10px;
-            border-radius: 20px;
-            color: darkblue;
-            font-weight: bold;
-        }
-
-        .score-box{
-            background-color: #d4edda;
-            color: #155724;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .excellent{
-            background-color: gold;
-            color: black;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .good{
-            background-color: #28a745;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .average{
-            background-color: #ffc107;
-            color: black;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .poor{
-            background-color: #dc3545;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
     </style>
-
 </head>
 
-<body>
+<body class="text-white font-sans">
 
-<div class="container">
+<div class="max-w-7xl mx-auto p-6">
 
-<h1>Resume Version History</h1>
+<!-- HEADER -->
+<h1 class="text-4xl font-bold text-center mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+AI Resume Version History
+</h1>
 
-<hr>
+<!-- NAV -->
+<div class="flex justify-center gap-4 mb-6">
 
-<div class="top-links">
+<a href="/dashboard" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20">
+Dashboard
+</a>
 
-    <a href="/dashboard">
-        Dashboard
-    </a>
-
-    <a href="/resume">
-        Create Resume
-    </a>
+<a href="/resume" class="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-600">
+Create Resume
+</a>
 
 </div>
 
-<div class="search-box">
+<!-- SEARCH -->
+<div class="flex justify-center mb-6">
 
-<form method="GET" action="/versions">
+<form method="GET" action="/versions" class="flex gap-2">
 
-    <input
-        type="text"
-        name="search"
-        placeholder="Search by name"
-    >
+<input
+    type="text"
+    name="search"
+    placeholder="Search AI resumes..."
+    value="{{ request.args.get('search','') }}"
+    class="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white w-72 outline-none"
+/>
 
-    <button type="submit">
-        Search
-    </button>
+<button class="px-4 py-2 bg-blue-500 rounded-xl hover:bg-blue-600">
+Search
+</button>
 
 </form>
 
 </div>
 
-<table>
+<!-- TABLE -->
+<div class="glass rounded-2xl overflow-hidden shadow-2xl">
 
-<tr>
-    <th>Photo</th>
+<table class="w-full text-sm">
+
+<!-- HEADER -->
+<tr class="bg-white/10 text-left">
+    <th class="p-4">Photo</th>
     <th>Version</th>
     <th>Name</th>
     <th>Skills</th>
-    <th>Template</th>
     <th>Score</th>
     <th>Rank</th>
-    <th>Preview</th>
-    <th>Restore</th>
-    <th>Delete</th>
-    <th>TXT</th>
-    <th>PDF</th>
+    <th>Actions</th>
 </tr>
 
 {% for resume, rank in resume_data %}
 
-<tr>
+<tr class="border-b border-white/10 row-hover">
 
-    <td>
-
-        {% if resume[5] %}
-
-        <img
-            src="/static/uploads/{{ resume[5] }}"
-            width="80"
-            height="80"
-        >
-
+    <!-- PHOTO -->
+    <td class="p-3">
+        {% if resume["photo"] %}
+            <img src="/static/uploads/{{ resume['photo'] }}"
+                 class="w-12 h-12 rounded-full border-2 border-purple-400 object-cover">
         {% else %}
-
-        No Image
-
+            <div class="text-gray-400">No Image</div>
         {% endif %}
-
     </td>
 
-    <td>
-        {{ resume[7] }}
+    <!-- VERSION -->
+    <td class="p-3 font-bold text-purple-300">
+        #{{ resume["version_number"] }}
     </td>
 
-    <td>
-        {{ resume[1] }}
+    <!-- NAME -->
+    <td class="p-3 font-semibold">
+        {{ resume["name"] }}
     </td>
 
-    <td>
-        {{ resume[2] }}
+    <!-- SKILLS (SAFE CUT) -->
+    <td class="p-3 text-gray-300 max-w-xs truncate">
+        {{ resume["skills"] }}
     </td>
 
-    <td>
-        <span class="template-box">
-            {{ resume[6] }}
+    <!-- SCORE -->
+    <td class="p-3">
+        <span class="px-3 py-1 rounded-full bg-green-500/30 text-green-200">
+            {{ resume["score"] }}/100
         </span>
     </td>
 
-    <td>
-        <span class="score-box">
-            {{ resume[8] }}/100
-        </span>
-    </td>
-
-    <td>
+    <!-- RANK -->
+    <td class="p-3">
 
         {% if rank == "Excellent" %}
-
-            <span class="excellent">
-                {{ rank }}
-            </span>
+        <span class="px-3 py-1 rounded-full bg-yellow-400 text-black font-bold">
+            {{ rank }}
+        </span>
 
         {% elif rank == "Good" %}
-
-            <span class="good">
-                {{ rank }}
-            </span>
+        <span class="px-3 py-1 rounded-full bg-green-500 text-white">
+            {{ rank }}
+        </span>
 
         {% elif rank == "Average" %}
-
-            <span class="average">
-                {{ rank }}
-            </span>
+        <span class="px-3 py-1 rounded-full bg-orange-400 text-black">
+            {{ rank }}
+        </span>
 
         {% else %}
-
-            <span class="poor">
-                {{ rank }}
-            </span>
-
+        <span class="px-3 py-1 rounded-full bg-red-500 text-white">
+            {{ rank }}
+        </span>
         {% endif %}
 
     </td>
 
-    <td>
-        <a
-            class="action-btn preview"
-            href="/preview/{{ resume[0] }}"
-        >
-            Preview
-        </a>
-    </td>
+    <!-- ACTIONS -->
+    <td class="p-3 space-x-2">
 
-    <td>
-        <a
-            class="action-btn restore"
-            href="/restore/{{ resume[0] }}"
-        >
-            Restore
+        <a href="/preview/{{ resume['id'] }}"
+           class="px-3 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-600">
+            View
         </a>
-    </td>
 
-    <td>
-        <a
-            class="action-btn delete"
-            href="/delete/{{ resume[0] }}"
-        >
+        <a href="/delete/{{ resume['id'] }}"
+           class="px-3 py-1 rounded-lg bg-red-500 hover:bg-red-600">
             Delete
         </a>
-    </td>
 
-    <td>
-        <a
-            class="action-btn txt"
-            href="/download/{{ resume[0] }}"
-        >
-            TXT
-        </a>
-    </td>
-
-    <td>
-        <a
-            class="action-btn pdf"
-            href="/pdf/{{ resume[0] }}"
-        >
+        <a href="/pdf/{{ resume['id'] }}"
+           class="px-3 py-1 rounded-lg bg-yellow-500 text-black hover:bg-yellow-600">
             PDF
         </a>
+
     </td>
 
 </tr>
@@ -370,6 +175,8 @@
 {% endfor %}
 
 </table>
+
+</div>
 
 </div>
 

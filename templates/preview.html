@@ -2,146 +2,99 @@
 <html>
 
 <head>
-
-    <title>Resume Preview</title>
+    <title>AI Resume Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-
-        body{
-            font-family: Arial;
-            background-color: #f0f2f5;
-            padding: 40px;
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
+            min-height: 100vh;
         }
 
-        .resume-box{
-            width: 700px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px gray;
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
-
-        img{
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid darkblue;
-        }
-
-        h1{
-            color: darkblue;
-            margin-top: 10px;
-        }
-
-        h2{
-            color: #333;
-        }
-
-        hr{
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-
-        .template{
-            color: green;
-            font-weight: bold;
-        }
-
-        .version{
-            color: gray;
-        }
-
-        .score{
-            color: darkblue;
-            font-weight: bold;
-        }
-
-        .rank{
-            color: #ff6600;
-            font-weight: bold;
-        }
-
-        .btn{
-            text-decoration: none;
-            background-color: darkblue;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-
-        .btn:hover{
-            background-color: black;
-        }
-
     </style>
-
 </head>
 
-<body>
+<body class="text-white font-sans">
 
-<div class="resume-box">
+<div class="max-w-4xl mx-auto p-6">
 
-    <center>
+<!-- TOP CARD -->
+<div class="glass rounded-2xl p-6 shadow-2xl text-center">
 
-        <img
-        src="/static/uploads/{{ resume[5] }}"
-        alt="Profile Photo"
-        >
-
-        <h1>{{ resume[1] }}</h1>
-
-        <p class="template">
-            Template :
-            {{ resume[6] }}
-        </p>
-
-    </center>
-
-    <hr>
-
-    <h2>Skills</h2>
-
-    <p>{{ resume[2] }}</p>
-
-    <hr>
-
-    <h2>Education</h2>
-
-    <p>{{ resume[3] }}</p>
-
-    <hr>
-
-    <h2>Experience</h2>
-
-    <p>{{ resume[4] }}</p>
-
-    <hr>
-
-    <h3 class="score">
-        Resume Score :
-        {{ resume[8] }}/100
-    </h3>
-
-    <h3 class="rank">
-        Resume Rank :
-        {{ rank }}
-    </h3>
-
-    <h3 class="version">
-        Resume Version :
-        {{ resume[7] }}
-    </h3>
-
-    <br>
-
-    <a
-    href="/versions"
-    class="btn"
+    <!-- PHOTO -->
+    <img
+        src="/static/uploads/{{ resume['photo'] }}"
+        class="w-28 h-28 mx-auto rounded-full border-4 border-purple-400 shadow-lg object-cover"
     >
-        Back to Versions
-    </a>
+
+    <!-- NAME -->
+    <h1 class="text-3xl font-bold mt-4">
+        {{ resume['name'] }}
+    </h1>
+
+    <p class="text-gray-300 mt-1">
+        AI Generated Professional Resume
+    </p>
+
+</div>
+
+<!-- CONTACT -->
+<div class="mt-6 glass p-5 rounded-xl">
+    <h2 class="text-xl font-bold text-cyan-300">Contact</h2>
+    <p class="mt-2 text-gray-200 leading-7">
+        📧 {{ resume['email'] }} <br>
+        📱 {{ resume['phone'] }} <br>
+        🔗 {{ resume['linkedin'] }} <br>
+        📍 {{ resume['location'] }}
+    </p>
+</div>
+
+<!-- OBJECTIVE -->
+<div class="glass p-5 rounded-xl mt-4">
+    <h2 class="text-xl font-bold text-pink-300">Objective</h2>
+    <p class="mt-2 text-gray-200">
+        {{ resume['objective'] }}
+    </p>
+</div>
+
+<!-- SKILLS -->
+<div class="glass p-5 rounded-xl mt-4">
+    <h2 class="text-xl font-bold text-blue-300">Skills</h2>
+    <p class="mt-2 text-gray-200">
+        {{ resume['skills'] }}
+    </p>
+</div>
+
+<!-- EDUCATION -->
+<div class="glass p-5 rounded-xl mt-4">
+    <h2 class="text-xl font-bold text-purple-300">Education</h2>
+    <p class="mt-2 text-gray-200">
+        {{ resume['education'] }}
+    </p>
+</div>
+
+<!-- EXPERIENCE -->
+<div class="glass p-5 rounded-xl mt-4">
+    <h2 class="text-xl font-bold text-green-300">Experience</h2>
+    <p class="mt-2 text-gray-200">
+        {{ resume['experience'] }}
+    </p>
+</div>
+
+<!-- BUTTON -->
+<div class="text-center mt-6">
+
+<a href="/versions"
+   class="inline-block px-6 py-3 bg-blue-500 rounded-xl hover:bg-blue-600 transition">
+   ← Back to Versions
+</a>
+
+</div>
 
 </div>
 
