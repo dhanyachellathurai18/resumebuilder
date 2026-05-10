@@ -153,6 +153,38 @@
             font-weight: bold;
         }
 
+        .excellent{
+            background-color: gold;
+            color: black;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .good{
+            background-color: #28a745;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .average{
+            background-color: #ffc107;
+            color: black;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .poor{
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
     </style>
 
 </head>
@@ -204,6 +236,7 @@
     <th>Skills</th>
     <th>Template</th>
     <th>Score</th>
+    <th>Rank</th>
     <th>Preview</th>
     <th>Restore</th>
     <th>Delete</th>
@@ -211,7 +244,7 @@
     <th>PDF</th>
 </tr>
 
-{% for resume in resumes %}
+{% for resume, rank in resume_data %}
 
 <tr>
 
@@ -255,6 +288,36 @@
         <span class="score-box">
             {{ resume[8] }}/100
         </span>
+    </td>
+
+    <td>
+
+        {% if rank == "Excellent" %}
+
+            <span class="excellent">
+                {{ rank }}
+            </span>
+
+        {% elif rank == "Good" %}
+
+            <span class="good">
+                {{ rank }}
+            </span>
+
+        {% elif rank == "Average" %}
+
+            <span class="average">
+                {{ rank }}
+            </span>
+
+        {% else %}
+
+            <span class="poor">
+                {{ rank }}
+            </span>
+
+        {% endif %}
+
     </td>
 
     <td>

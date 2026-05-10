@@ -14,7 +14,6 @@ UPLOAD_FOLDER = 'static/uploads'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Create upload folder automatically
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
@@ -34,7 +33,6 @@ def create_table():
 
     conn = get_db()
 
-    # Users table
     conn.execute("""
     CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +42,6 @@ def create_table():
     )
     """)
 
-    # Resume versions table
     conn.execute("""
     CREATE TABLE IF NOT EXISTS resume_versions(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,10 +71,7 @@ def calculate_score(skills, education, experience, photo):
 
     score = 0
 
-    # =========================
-    # SKILLS SCORE
-    # =========================
-
+    # Skills Score
     skills_length = len(skills)
 
     if skills_length >= 100:
@@ -92,10 +86,7 @@ def calculate_score(skills, education, experience, photo):
     else:
         score += 5
 
-    # =========================
-    # EDUCATION SCORE
-    # =========================
-
+    # Education Score
     education_length = len(education)
 
     if education_length >= 100:
@@ -110,10 +101,7 @@ def calculate_score(skills, education, experience, photo):
     else:
         score += 5
 
-    # =========================
-    # EXPERIENCE SCORE
-    # =========================
-
+    # Experience Score
     experience_length = len(experience)
 
     if experience_length >= 100:
@@ -128,22 +116,14 @@ def calculate_score(skills, education, experience, photo):
     else:
         score += 5
 
-    # =========================
-    # PHOTO SCORE
-    # =========================
-
+    # Photo Score
     if photo != "noimage.png":
         score += 10
 
-    # =========================
-    # BONUS FEATURES
-    # =========================
-
-    # Bonus for multiple skills
+    # Bonus
     if "," in skills:
         score += 5
 
-    # Bonus for professional keywords
     professional_words = [
         "python",
         "java",
@@ -162,11 +142,30 @@ def calculate_score(skills, education, experience, photo):
         if word in skills_lower:
             score += 2
 
-    # Maximum score limit
+    # Maximum score
     if score > 100:
         score = 100
 
     return score
+
+
+# ======================================
+# GET RESUME RANK
+# ======================================
+
+def get_rank(score):
+
+    if score >= 90:
+        return "Excellent"
+
+    elif score >= 70:
+        return "Good"
+
+    elif score >= 50:
+        return "Average"
+
+    else:
+        return "Poor"
 
 
 # ======================================
@@ -283,10 +282,8 @@ def resume():
         education = request.form['education']
         experience = request.form['experience']
 
-        # Template Feature
         template = request.form['template']
 
-        # Photo Upload
         photo = request.files['photo']
 
         filename = photo.filename
@@ -305,10 +302,7 @@ def resume():
 
             filename = "noimage.png"
 
-        # ======================================
-        # CALCULATE SCORE
-        # ======================================
-
+        # Calculate Score
         score = calculate_score(
             skills,
             education,
@@ -316,15 +310,19 @@ def resume():
             filename
         )
 
+        # Get Rank
+        rank = get_rank(score)
+
         conn = get_db()
 
-        # Latest version number
+        # Get Latest Version
         last_version = conn.execute(
             "SELECT MAX(version_number) FROM resume_versions"
         ).fetchone()[0]
 
         if last_version is None:
             version = 1
+
         else:
             version = last_version + 1
 
@@ -357,6 +355,54 @@ def resume():
         conn.close()
 
         return f"""
+        <html>
+
+        <head>
+
+            <title>Resume Saved</title>
+
+            <style>
+
+                body{{
+                    font-family: Arial;
+                    background:#f0f2f5;
+                    padding:40px;
+                }}
+
+                .box{{
+                    width:500px;
+                    margin:auto;
+                    background:white;
+                    padding:30px;
+                    border-radius:10px;
+                    box-shadow:0px 0px 10px gray;
+                    text-align:center;
+                }}
+
+                h2{{
+                    color:green;
+                }}
+
+                h3{{
+                    color:darkblue;
+                }}
+
+                a{{
+                    text-decoration:none;
+                    background:darkblue;
+                    color:white;
+                    padding:10px 20px;
+                    border-radius:5px;
+                }}
+
+            </style>
+
+        </head>
+
+        <body>
+
+        <div class="box">
+
         <h2>
         Resume Saved Successfully!
         </h2>
@@ -365,9 +411,21 @@ def resume():
         Resume Score: {score}/100
         </h3>
 
+        <h3>
+        Resume Rank: {rank}
+        </h3>
+
+        <br>
+
         <a href='/dashboard'>
             Go To Dashboard
         </a>
+
+        </div>
+
+        </body>
+
+        </html>
         """
 
     return render_template('resume.html')
@@ -401,9 +459,23 @@ def versions():
 
     conn.close()
 
+    # ======================================
+    # STORE RESUME + RANK
+    # ======================================
+
+    resume_data = []
+
+    for r in resumes:
+
+        rank = get_rank(r[8])
+
+        resume_data.append(
+            (r, rank)
+        )
+
     return render_template(
         'versions.html',
-        resumes=resumes
+        resume_data=resume_data
     )
 
 
@@ -423,9 +495,12 @@ def preview(id):
 
     conn.close()
 
+    rank = get_rank(resume[8])
+
     return render_template(
         'preview.html',
-        resume=resume
+        resume=resume,
+        rank=rank
     )
 
 
@@ -445,6 +520,8 @@ def restore(id):
 
     conn.close()
 
+    rank = get_rank(resume[8])
+
     return f"""
     <html>
 
@@ -452,72 +529,34 @@ def restore(id):
 
         <title>Restored Resume</title>
 
-        <style>
-
-            body{{
-                font-family: Arial;
-                background:#f0f2f5;
-                padding:40px;
-            }}
-
-            .box{{
-                width:700px;
-                margin:auto;
-                background:white;
-                padding:30px;
-                border-radius:10px;
-                box-shadow:0px 0px 10px gray;
-            }}
-
-            img{{
-                border-radius:50%;
-            }}
-
-        </style>
-
     </head>
 
     <body>
 
-    <div class="box">
-
-    <center>
-
     <h1>Restored Resume</h1>
 
-    <img
-    src="/static/uploads/{resume[5]}"
-    width="150"
-    height="150"
-    >
+    <p>Name: {resume[1]}</p>
 
-    </center>
+    <p>Skills: {resume[2]}</p>
 
-    <hr>
+    <p>Education: {resume[3]}</p>
 
-    <p><b>Name:</b> {resume[1]}</p>
+    <p>Experience: {resume[4]}</p>
 
-    <p><b>Skills:</b> {resume[2]}</p>
+    <p>Template: {resume[6]}</p>
 
-    <p><b>Education:</b> {resume[3]}</p>
+    <p>Version: {resume[7]}</p>
 
-    <p><b>Experience:</b> {resume[4]}</p>
+    <p>Score: {resume[8]}/100</p>
 
-    <p><b>Template:</b> {resume[6]}</p>
-
-    <p><b>Version:</b> {resume[7]}</p>
-
-    <p><b>Resume Score:</b> {resume[8]}/100</p>
-
-    <br>
+    <p>Rank: {rank}</p>
 
     <a href="/versions">
-        Back to Versions
+        Back
     </a>
 
-    </div>
-
     </body>
+
     </html>
     """
 
@@ -558,6 +597,8 @@ def download(id):
 
     conn.close()
 
+    rank = get_rank(resume[8])
+
     content = f"""
 Resume Version: {resume[7]}
 
@@ -578,6 +619,9 @@ Template:
 
 Resume Score:
 {resume[8]}/100
+
+Resume Rank:
+{rank}
 """
 
     response = make_response(content)
@@ -607,62 +651,14 @@ def pdf(id):
 
     conn.close()
 
+    rank = get_rank(resume[8])
+
     buffer = BytesIO()
 
     p = canvas.Canvas(buffer)
 
-    # ======================================
-    # TEMPLATE DESIGNS
-    # ======================================
-
-    if resume[6] == "Modern":
-
-        p.setFont("Helvetica-Bold", 22)
-        p.drawString(170, 820, "MODERN RESUME")
-
-        p.line(70, 810, 520, 810)
-
-    elif resume[6] == "Professional":
-
-        p.setFont("Times-Bold", 22)
-        p.drawString(150, 820, "PROFESSIONAL RESUME")
-
-        p.line(70, 810, 520, 810)
-
-    else:
-
-        p.setFont("Courier-Bold", 22)
-        p.drawString(180, 820, "CLASSIC RESUME")
-
-        p.line(70, 810, 520, 810)
-
-    # ======================================
-    # PROFILE IMAGE
-    # ======================================
-
-    image_path = os.path.join(
-        app.config['UPLOAD_FOLDER'],
-        resume[5]
-    )
-
-    if os.path.exists(image_path):
-
-        try:
-
-            p.drawImage(
-                image_path,
-                380,
-                640,
-                width=120,
-                height=120
-            )
-
-        except:
-            pass
-
-    # ======================================
-    # CONTENT
-    # ======================================
+    p.setFont("Helvetica-Bold", 22)
+    p.drawString(170, 820, "RESUME")
 
     p.setFont("Helvetica-Bold", 14)
 
@@ -671,6 +667,7 @@ def pdf(id):
     p.drawString(70, 640, "Education")
     p.drawString(70, 570, "Experience")
     p.drawString(70, 500, "Resume Score")
+    p.drawString(70, 460, "Resume Rank")
 
     p.setFont("Helvetica", 12)
 
@@ -689,15 +686,7 @@ def pdf(id):
     p.drawText(text)
 
     p.drawString(150, 500, f"{resume[8]}/100")
-
-    # Footer
-    p.setFont("Helvetica-Oblique", 10)
-
-    p.drawString(
-        70,
-        100,
-        f"Template: {resume[6]} | Version: {resume[7]}"
-    )
+    p.drawString(150, 460, rank)
 
     p.save()
 

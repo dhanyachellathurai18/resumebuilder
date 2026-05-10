@@ -53,6 +53,16 @@
             color: gray;
         }
 
+        .score{
+            color: darkblue;
+            font-weight: bold;
+        }
+
+        .rank{
+            color: #ff6600;
+            font-weight: bold;
+        }
+
         .btn{
             text-decoration: none;
             background-color: darkblue;
@@ -108,6 +118,16 @@
     <p>{{ resume[4] }}</p>
 
     <hr>
+
+    <h3 class="score">
+        Resume Score :
+        {{ resume[8] }}/100
+    </h3>
+
+    <h3 class="rank">
+        Resume Rank :
+        {{ rank }}
+    </h3>
 
     <h3 class="version">
         Resume Version :
